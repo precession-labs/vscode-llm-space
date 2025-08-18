@@ -51,6 +51,12 @@
     "test:cov": "npm run cleanCov && npm test -- --coverage",
     "upgradepackages": "./scripts/upgrade_packages.sh"
   },
+  "lint-staged": {
+    "{src,tests}/**/*.{js,ts,tsx}": [
+      "eslint",
+      "git add"
+    ]
+  },
   "dependencies": {
   },
   "devDependencies": {

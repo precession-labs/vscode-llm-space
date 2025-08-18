@@ -1,1 +1,4 @@
-npx --no-install lint-staged
+npx --no-install lint-staged --verbose || {
+  echo "❌ ESLint check failed. Please fix and commit again."
+  exit 1
+}
