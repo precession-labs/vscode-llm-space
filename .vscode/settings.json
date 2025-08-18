@@ -1,0 +1,21 @@
+{
+  "editor.defaultFormatter": "dprint.dprint",
+  "editor.tabSize": 2,
+  "search.exclude": {
+    "**/dist": true,
+    "**/pnpm-lock.yaml": true,
+    "**/examples/**/*.json": true
+  },
+  "javascript.format.placeOpenBraceOnNewLineForControlBlocks": false,
+  "javascript.format.placeOpenBraceOnNewLineForFunctions": false,
+  "javascript.preferences.quoteStyle": "single",
+  "typescript.format.placeOpenBraceOnNewLineForControlBlocks": false,
+  "typescript.format.placeOpenBraceOnNewLineForFunctions": false,
+  "typescript.preferences.quoteStyle": "single",
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "sfmt.braces": "knr",
+  "sfmt.insize": 2,
+  "[typescript]": {
+    "editor.defaultFormatter": "dprint.dprint"
+  }
+}

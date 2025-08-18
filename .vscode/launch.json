@@ -1,0 +1,23 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch Extension",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "smartStep": true,
+      "sourceMaps": true,
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--disable-workspace-trust"
+      ],
+      "outFiles": [
+        "${workspaceFolder}/dist/**/*.js"
+      ],
+      "env": {
+        "IS_DEV": "true"
+      }
+    }
+  ]
+}

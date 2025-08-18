@@ -1,0 +1,83 @@
+{
+  "name": "vscode-llm-space",
+  "displayName": "%displayName%",
+  "description": "%description%",
+  "version": "1.0.0",
+  "publisher": "precession-labs",
+  "author": {
+    "name": "precession-labs",
+    "url": "https://github.com/precession-labs"
+  },
+  "homepage": "https://github.com/precession-labs/vscode-llm-space",
+  "bugs": "https://github.com/precession-labs/vscode-llm-space/issues",
+  "license": "MIT",
+  "main": "dist/extension",
+  "icon": "resources/logo.png",
+  "engines": {
+    "vscode": "^1.84.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "llm",
+    "llm-space",
+    "prompt"
+  ],
+  "activationEvents": [
+    "*"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "vls.log",
+        "title": "%commands.log%"
+      }
+    ],
+    "configuration": [],
+    "keybindings": []
+  },
+  "scripts": {
+    "prepare": "husky",
+    "vscode:prepublish": "npm run build",
+    "prebuild": "npm run clean && npm run cleanCov",
+    "build": "cross-env NODE_ENV=production webpack --config ./scripts/webpack.config.prod.js",
+    "build:ts": "tsc -p ./tsconfig.json",
+    "watch": "tsc -p ./tsconfig.json -w",
+    "clean": "rimraf dist/*",
+    "cleanCov": "rimraf @coverage",
+    "test": "jest --config ./scripts/jest.config.js",
+    "test:watch": "npm test -- --watch",
+    "test:cov": "npm run cleanCov && npm test -- --coverage",
+    "upgradepackages": "./scripts/upgrade_packages.sh"
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.1",
+    "@eslint/js": "^9.33.0",
+    "@types/fs-extra": "^11.0.4",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.3.0",
+    "@types/vscode": "^1.84.0",
+    "@typescript-eslint/eslint-plugin": "^8.39.1",
+    "@typescript-eslint/parser": "^8.39.1",
+    "cross-env": "^10.0.0",
+    "dprint": "^0.50.1",
+    "eslint-config-zoro": "^6.1.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-webpack-plugin": "^5.0.2",
+    "eslint": "^9.33.0",
+    "fork-ts-checker-webpack-plugin": "^9.1.0",
+    "husky": "^9.1.7",
+    "jest": "^30.0.5",
+    "lint-staged": "^16.1.5",
+    "rimraf": "^6.0.1",
+    "ts-jest": "^29.4.1",
+    "ts-loader": "^9.5.2",
+    "typescript": "^5.9.2",
+    "webpack-cli": "^6.0.1",
+    "webpack": "^5.101.2",
+    "webpackbar": "^7.0.0"
+  }
+}

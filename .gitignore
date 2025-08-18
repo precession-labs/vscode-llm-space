@@ -1,0 +1,8 @@
+# Node files
+node_modules
+
+# OS junk files
+.DS_Store
+
+# Project specific stuff
+dist
