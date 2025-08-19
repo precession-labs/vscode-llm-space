@@ -14,6 +14,18 @@ export function openFile(filepath: string) {
 }
 
 /**
+ * Gets the setting from `VSCode User Settings`.
+ *
+ * Example:
+ * ```ts
+ * const theme = api.getVSCodeSetting("workbench", "colorTheme");
+ * ```
+ */
+export function getVSCodeSetting<T>(section: string, key: string, defaultValue?: T): T {
+  return vscode.workspace.getConfiguration(section).get<T>(key, defaultValue as T);
+}
+
+/**
  * Reload VSCode window.
  */
 export function reloadWindow() {
@@ -26,4 +38,14 @@ export function reloadWindow() {
 export function registerCommand(context: vscode.ExtensionContext, command: string, callback: () => void) {
   // Add to a list of disposables which are disposed when this extension is deactivated.
   context.subscriptions.push(vscode.commands.registerCommand(command, callback));
+}
+
+/**
+ * Get current color theme info.
+ */
+export function getCurrentColorTheme() {
+  return {
+    kind: vscode.window.activeColorTheme.kind,
+    name: getVSCodeSetting("workbench", "colorTheme")
+  };
 }
