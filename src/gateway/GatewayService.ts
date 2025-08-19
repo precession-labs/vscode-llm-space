@@ -24,7 +24,7 @@ export class GatewayService {
       options.provider ?? ConfigProvider.defaults.provider ?? ""
     );
     const baseURL = provider.baseURL;
-    const apiKey = provider.envKey ? process.env[provider.envKey] : "NO_API_KEY";
+    const apiKey = provider.apiKey ?? "NO_API_KEY";
     const headers = Object.keys(provider.headers ?? {}).reduce(
       (acc: Record<string, string>, key) => {
         const value = provider.headers?.[key]?.trim();

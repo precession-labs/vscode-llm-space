@@ -13,7 +13,6 @@ model: gpt-4o-mini
 providers:
   - name: openai
     baseURL: https://api.openai.com/v1
-    envKey: OPENAI_API_KEY
     models:
       - id: gpt-4o
   - name: local
