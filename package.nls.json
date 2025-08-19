@@ -1,5 +1,5 @@
 {
   "displayName": "VSCode LLM Space",
   "description": "Developing LLM in VSCode.",
-  "commands.log": "LLM Space: Log"
+  "commands.log": "Log"
 }

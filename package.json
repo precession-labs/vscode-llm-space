@@ -31,7 +31,8 @@
     "commands": [
       {
         "command": "vls.log",
-        "title": "%commands.log%"
+        "title": "%commands.log%",
+        "category": "LLM Space"
       }
     ],
     "configuration": [],
