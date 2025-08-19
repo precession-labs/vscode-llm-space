@@ -17,6 +17,9 @@
       ],
       "env": {
         "IS_DEV": "true"
+      },
+      "osx": {
+        "preLaunchTask": "tsc-watch"
       }
     }
   ]
