@@ -1,5 +1,6 @@
 {
   "displayName": "VSCode LLM Space",
   "description": "在 VSCode 中开发 LLM。",
-  "commands.log": "打印测试"
+  "commands.log": "LLM Space: 打印测试",
+  "commands.openWebview": "LLM Space: 打开"
 }

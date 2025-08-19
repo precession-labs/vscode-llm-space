@@ -1,0 +1,1 @@
+Count the words of user's input

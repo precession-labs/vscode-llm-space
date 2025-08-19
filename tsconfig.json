@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
     "outDir": "dist",
-    "module": "commonjs",
+    "module": "Node16",
     "target": "es2017",
     "declaration": false,
     "sourceMap": true,
-    "moduleResolution": "node",
+    "moduleResolution": "node16",
     "allowUnreachableCode": true,
     "experimentalDecorators": true,
     "noImplicitAny": true,

@@ -35,7 +35,7 @@ export function reloadWindow() {
 /**
  * Register extension command on VSCode.
  */
-export function registerCommand(context: vscode.ExtensionContext, command: string, callback: () => void) {
+export function registerCommand(context: vscode.ExtensionContext, command: string, callback: (...args: any[]) => void) {
   // Add to a list of disposables which are disposed when this extension is deactivated.
   context.subscriptions.push(vscode.commands.registerCommand(command, callback));
 }

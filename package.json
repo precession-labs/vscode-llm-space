@@ -25,14 +25,52 @@
     "prompt"
   ],
   "activationEvents": [
-    "*"
+    "onLanguage:markdown"
   ],
   "contributes": {
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "vls.openWebview",
+          "when": "resourceLangId == markdown",
+          "group": "navigation"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "vls.openWebview",
+          "when": "resourceLangId == markdown",
+          "group": "navigation"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "vls_container",
+          "title": "LLM Space",
+          "icon": "resources/logo.png"
+        }
+      ]
+    },
+    "views": {
+      "vls_container": [
+        {
+          "id": "vls_container_webview",
+          "name": "LLM Space",
+          "type": "webview"
+        }
+      ]
+    },
     "commands": [
       {
         "command": "vls.log",
         "title": "%commands.log%",
         "category": "LLM Space"
+      },
+      {
+        "command": "vls.openWebview",
+        "title": "%commands.openWebview%"
       }
     ],
     "configuration": [],
@@ -59,22 +97,28 @@
     ]
   },
   "dependencies": {
+    "js-yaml": "^4.1.0",
+    "openai": "^5.12.2",
+    "typed-rpc": "^6.1.1",
+    "uuid": "^11.1.0",
+    "vscode-uri": "^3.1.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
     "@eslint/js": "^9.33.0",
     "@types/fs-extra": "^11.0.4",
     "@types/jest": "^30.0.0",
+    "@types/js-yaml": "^4.0.9",
     "@types/node": "^24.3.0",
     "@types/vscode": "^1.84.0",
     "@typescript-eslint/eslint-plugin": "^8.39.1",
     "@typescript-eslint/parser": "^8.39.1",
     "cross-env": "^10.0.0",
     "dprint": "^0.50.1",
+    "eslint": "^9.33.0",
     "eslint-config-zoro": "^6.1.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-webpack-plugin": "^5.0.2",
-    "eslint": "^9.33.0",
     "fork-ts-checker-webpack-plugin": "^9.1.0",
     "husky": "^9.1.7",
     "jest": "^30.0.5",
@@ -83,8 +127,8 @@
     "ts-jest": "^29.4.1",
     "ts-loader": "^9.5.2",
     "typescript": "^5.9.2",
-    "webpack-cli": "^6.0.1",
     "webpack": "^5.101.2",
+    "webpack-cli": "^6.0.1",
     "webpackbar": "^7.0.0"
   }
 }
