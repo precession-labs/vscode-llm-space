@@ -6,6 +6,7 @@ import { FileType, Stat, URI } from "../filesystem/common";
 import { md5 } from "../utils/md5";
 import { Thread } from "./common";
 import path = require("path");
+import { ConfigProvider } from "../config/providers";
 
 export class ThreadService {
   constructor(private readonly context: ExtensionContext) {}
@@ -26,6 +27,8 @@ export class ThreadService {
     if (!latest || !this.baseDir) {
       return {
         id: threadId,
+        model: ConfigProvider.defaults.model,
+        model_provider: ConfigProvider.defaults.provider,
         messages: [
           {
             id: uuidv7(),

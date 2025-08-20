@@ -50,6 +50,11 @@ export class GatewayService {
     return stream;
   }
 
+  saveProviders(config: Config): Promise<Config> {
+    ConfigProvider.update(config);
+    return Promise.resolve(config);
+  }
+
   async getModels(): Promise<Model[]> {
     const config = await ConfigProvider.load(
       this.context.globalStorageUri.fsPath
