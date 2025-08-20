@@ -1,4 +1,4 @@
-import { join } from 'path';
+import { join } from "path";
 import type { Config, Provider } from "./config";
 import { loadYamlConfig, saveYamlConfig } from "./loader";
 
@@ -8,20 +8,20 @@ export const ConfigProvider = {
 
   get config() {
     if (!this._config) {
-      throw new Error('Config not loaded');
+      throw new Error("Config not loaded");
     }
     return this._config;
   },
 
   load(basePath: string) {
-    const filePath = join(basePath, 'config.yaml');
+    const filePath = join(basePath, "config.yaml");
     this._path = filePath;
     this._config ??= loadYamlConfig(filePath);
     return this._config;
   },
 
   get(name: string): Provider {
-    const provider = this.config.providers.find((p) => p.name === name);
+    const provider = this.config.providers.find(p => p.name === name);
     if (!provider) {
       throw new Error(`Provider ${name} not found`);
     }
@@ -30,7 +30,7 @@ export const ConfigProvider = {
 
   update(config: Config) {
     if (!this._path) {
-      throw new Error('Config not loaded');
+      throw new Error("Config not loaded");
     }
     this._config = config;
     saveYamlConfig(config, this._path);
@@ -43,7 +43,7 @@ export const ConfigProvider = {
   get defaults() {
     return {
       provider: this.config.provider,
-      model: this.config.model,
+      model: this.config.model
     };
-  },
+  }
 };

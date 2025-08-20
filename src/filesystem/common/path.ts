@@ -34,13 +34,13 @@
 
 export enum PathFormat {
   Posix,
-  Windows,
+  Windows
 }
 
 export enum OsType {
   Windows = "Windows",
   Linux = "Linux",
-  OSX = "OSX",
+  OSX = "OSX"
 }
 
 const isWindows = is("Windows", "win32");
@@ -52,7 +52,7 @@ export const OS = {
   type: isWindows ? OsType.Windows : isOSX ? OsType.OSX : OsType.Linux,
   isWindows,
   isOSX,
-  EOL,
+  EOL
 };
 
 function is(userAgent: string, platform: string): boolean {
@@ -82,9 +82,9 @@ export class Path {
   static normalizeDrive(path: string): string {
     // lower-case windows drive letters in /C:/fff or C:/fff
     if (
-      path.length >= 3 &&
-      path.charCodeAt(0) === 47 /* '/' */ &&
-      path.charCodeAt(2) === 58 /* ':' */
+      path.length >= 3
+      && path.charCodeAt(0) === 47 /* '/' */
+      && path.charCodeAt(2) === 58 /* ':' */
     ) {
       const code = path.charCodeAt(1);
       if (code >= 65 /* A */ && code <= 90 /* Z */) {
@@ -155,8 +155,7 @@ export class Path {
     if (resourcePath.startsWith("~")) {
       const untildifiedResource = resourcePath.replace(/^~/, home);
       const untildifiedPath = new Path(untildifiedResource);
-      const isWindows =
-        untildifiedPath.root && Path.isDrive(untildifiedPath.root.base);
+      const isWindows = untildifiedPath.root && Path.isDrive(untildifiedPath.root.base);
       if (!isWindows && home && untildifiedResource.startsWith(`${home}`)) {
         return untildifiedResource;
       }
@@ -184,10 +183,9 @@ export class Path {
     const lastIndex = this.raw.lastIndexOf(Path.separator);
     this.isAbsolute = firstIndex === 0;
     this.base = lastIndex === -1 ? this.raw : this.raw.substring(lastIndex + 1);
-    this.isRoot =
-      this.isAbsolute &&
-      firstIndex === lastIndex &&
-      (!this.base || Path.isDrive(this.base));
+    this.isRoot = this.isAbsolute
+      && firstIndex === lastIndex
+      && (!this.base || Path.isDrive(this.base));
     this.root = this.computeRoot();
 
     const extIndex = this.base.lastIndexOf(".");
@@ -248,7 +246,7 @@ export class Path {
   }
 
   join(...paths: string[]): Path {
-    const relativePath = paths.filter((s) => !!s).join(Path.separator);
+    const relativePath = paths.filter(s => !!s).join(Path.separator);
     if (!relativePath) {
       return this;
     }
@@ -259,7 +257,6 @@ export class Path {
   }
 
   /**
-   *
    * @param paths portions of a path
    * @returns a new Path if an absolute path can be computed from the segments passed in + this.raw
    * If no absolute path can be computed, returns undefined.
@@ -295,8 +292,8 @@ export class Path {
    */
   fsPath(format?: PathFormat): string {
     if (
-      format === PathFormat.Windows ||
-      (format === undefined && OS.isWindows)
+      format === PathFormat.Windows
+      || (format === undefined && OS.isWindows)
     ) {
       return Path.windowsPath(this.raw);
     } else {
@@ -342,14 +339,14 @@ export class Path {
     const trailingSlash = this.raw.endsWith("/");
     const pathArray = this.toString().split("/");
     const resultArray: string[] = [];
-    pathArray.forEach((value) => {
+    pathArray.forEach(value => {
       if (!value || value === ".") {
         return;
       }
       if (value === "..") {
         if (
-          resultArray.length &&
-          resultArray[resultArray.length - 1] !== ".."
+          resultArray.length
+          && resultArray[resultArray.length - 1] !== ".."
         ) {
           resultArray.pop();
         } else if (!this.isAbsolute) {
@@ -367,9 +364,9 @@ export class Path {
       }
     }
     return new Path(
-      (this.isAbsolute ? "/" : "") +
-        resultArray.join("/") +
-        (trailingSlash ? "/" : ""),
+      (this.isAbsolute ? "/" : "")
+        + resultArray.join("/")
+        + (trailingSlash ? "/" : "")
     );
   }
 }

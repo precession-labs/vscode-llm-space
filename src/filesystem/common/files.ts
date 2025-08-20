@@ -2,7 +2,7 @@ import { type URI } from "./URI";
 
 export enum FileType {
   File = "file",
-  Directory = "directory",
+  Directory = "directory"
 }
 
 export interface Stat {
@@ -28,7 +28,7 @@ export const Files = {
       size: stat.size,
       type: stat.type,
       isFile: stat.type === FileType.File,
-      isDirectory: stat.type === FileType.Directory,
+      isDirectory: stat.type === FileType.Directory
     };
   },
 
@@ -38,11 +38,11 @@ export const Files = {
 
   equals(
     a: FileStat | null | undefined,
-    b: FileStat | null | undefined,
+    b: FileStat | null | undefined
   ): boolean {
     if (!a || !b) {
       return false;
     }
     return a.resource.isEqual(b.resource);
-  },
+  }
 };

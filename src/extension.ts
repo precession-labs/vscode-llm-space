@@ -25,8 +25,7 @@ function _registerCommands(
 ) {
   api.registerCommand(context, "vls.log", _log);
   api.registerCommand(context, "vls.openWebview", async (uri?: vscode.Uri) => {
-    const targetFile =
-      uri?.fsPath ?? vscode.window.activeTextEditor?.document.uri.fsPath;
+    const targetFile = uri?.fsPath ?? vscode.window.activeTextEditor?.document.uri.fsPath;
     if (!targetFile) {
       return;
     }
@@ -40,7 +39,7 @@ function _registerFileWatcher(
   viewProvider: MyWebviewViewProvider
 ) {
   const disposable = vscode.window.onDidChangeActiveTextEditor(
-    async (editor) => {
+    async editor => {
       if (editor && editor.document.languageId === "markdown") {
         await vscode.commands.executeCommand("vls_container_webview.focus");
         await viewProvider.open(editor.document.uri.fsPath);

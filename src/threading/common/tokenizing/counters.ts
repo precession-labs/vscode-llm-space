@@ -31,11 +31,11 @@ export interface MessageLatency {
 export function updateMessageCounter(
   counter: Counter,
   messageId: string,
-  updates: Partial<MessageCounter>,
+  updates: Partial<MessageCounter>
 ): void {
   counter.messages[messageId] ??= {
     token_used: 0,
-    latency: {},
+    latency: {}
   };
 
   const messageCounter = counter.messages[messageId];
@@ -47,7 +47,7 @@ export function updateMessageCounter(
   if (updates.latency) {
     messageCounter.latency = {
       ...messageCounter.latency,
-      ...updates.latency,
+      ...updates.latency
     };
   }
 }
@@ -56,11 +56,11 @@ export function updateMessageCounter(
  * Initialize counter if it doesn't exist
  */
 export function ensureCounter(thread: {
-  extra?: { counter?: Counter };
+  extra?: { counter?: Counter; };
 }): Counter {
   thread.extra ??= {};
   thread.extra.counter ??= {
-    messages: {},
+    messages: {}
   };
 
   return thread.extra.counter;

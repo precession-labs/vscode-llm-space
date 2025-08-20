@@ -1,1 +1,1 @@
-export * from './ThreadService'
+export * from "./ThreadService";

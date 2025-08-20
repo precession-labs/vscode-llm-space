@@ -4,7 +4,7 @@ import type { AssistantMessage, MessageChunk } from ".";
 
 export function messageReducer(
   message: AssistantMessage,
-  chunk: MessageChunk,
+  chunk: MessageChunk
 ): AssistantMessage {
   const choice = chunk.choices[0];
   if (!choice) {
@@ -25,9 +25,9 @@ function reduce(acc: any, delta: ChatCompletionChunk.Choice.Delta) {
         }
       }
     } else if (
-      key !== "role" &&
-      typeof acc[key] === "string" &&
-      typeof value === "string"
+      key !== "role"
+      && typeof acc[key] === "string"
+      && typeof value === "string"
     ) {
       acc[key] += value;
     } else if (typeof acc[key] === "number" && typeof value === "number") {
@@ -37,7 +37,7 @@ function reduce(acc: any, delta: ChatCompletionChunk.Choice.Delta) {
       for (const { index, ...chunkTool } of value) {
         if (index - accArray.length > 1) {
           throw new Error(
-            `Error: An array has an empty value when tool_calls are constructed. tool_calls: ${accArray.toString()}; tool: ${value.toString()}`,
+            `Error: An array has an empty value when tool_calls are constructed. tool_calls: ${accArray.toString()}; tool: ${value.toString()}`
           );
         }
         accArray[index] = reduce(accArray[index], chunkTool);

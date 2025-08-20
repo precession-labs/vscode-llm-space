@@ -6,7 +6,7 @@ export class URI {
   public static fromComponents(components: UriComponents): URI;
   public static fromComponents(components: undefined): undefined;
   public static fromComponents(
-    components: UriComponents | undefined,
+    components: UriComponents | undefined
   ): URI | undefined {
     return components ? new URI(Uri.revive(components)) : undefined;
   }
@@ -80,7 +80,7 @@ export class URI {
    */
   resolveToAbsolute(...pathSegments: Array<string | Path>): URI | undefined {
     const absolutePath = this.path.resolve(
-      ...pathSegments.map((path) => path.toString()),
+      ...pathSegments.map(path => path.toString())
     );
     if (absolutePath) {
       return this.withPath(absolutePath);
@@ -94,7 +94,7 @@ export class URI {
   withScheme(scheme: string): URI {
     const newCodeUri = Uri.from({
       ...this.codeUri.toJSON(),
-      scheme,
+      scheme
     });
     return new URI(newCodeUri);
   }
@@ -106,7 +106,7 @@ export class URI {
     const newCodeUri = Uri.from({
       ...this.codeUri.toJSON(),
       scheme: this.codeUri.scheme,
-      authority,
+      authority
     });
     return new URI(newCodeUri);
   }
@@ -125,7 +125,7 @@ export class URI {
     const newCodeUri = Uri.from({
       ...this.codeUri.toJSON(),
       scheme: this.codeUri.scheme,
-      path: path.toString(),
+      path: path.toString()
     });
     return new URI(newCodeUri);
   }
@@ -144,7 +144,7 @@ export class URI {
     const newCodeUri = Uri.from({
       ...this.codeUri.toJSON(),
       scheme: this.codeUri.scheme,
-      query,
+      query
     });
     return new URI(newCodeUri);
   }
@@ -163,7 +163,7 @@ export class URI {
     const newCodeUri = Uri.from({
       ...this.codeUri.toJSON(),
       scheme: this.codeUri.scheme,
-      fragment,
+      fragment
     });
     return new URI(newCodeUri);
   }
@@ -235,7 +235,7 @@ export class URI {
     uris.forEach((uri, i) => {
       if (
         !uris.some(
-          (otherUri, index) => index !== i && otherUri.isEqualOrParent(uri),
+          (otherUri, index) => index !== i && otherUri.isEqualOrParent(uri)
         )
       ) {
         result.push(uri);
@@ -254,7 +254,7 @@ export class URI {
       authority: this.authority,
       path: this.path.toString(),
       query: this.query,
-      fragment: this.fragment,
+      fragment: this.fragment
     };
   }
 }

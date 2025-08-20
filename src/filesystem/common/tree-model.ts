@@ -11,7 +11,7 @@ export interface TreeNode {
 export class TreeModel {
   constructor(
     private get: () => Record<string, TreeNode>,
-    private set: (nodes: Record<string, TreeNode>) => void,
+    private set: (nodes: Record<string, TreeNode>) => void
   ) {}
 
   updateRoot(file: FileStat) {
@@ -45,7 +45,7 @@ export class TreeModel {
               return 1;
             }
             return a.name.localeCompare(b.name);
-          }),
+          })
         );
       }
     }
@@ -72,9 +72,9 @@ export class TreeModel {
         ...parent,
         children: this.sortChildren(nodes, [
           ...parent.children,
-          file.resource.toString(),
-        ]),
-      },
+          file.resource.toString()
+        ])
+      }
     });
     return nodes[file.resource.toString()]!;
   }
@@ -85,7 +85,7 @@ export class TreeModel {
     const removed = this.removeChild(nodes, node);
     const parent = nodes[node.file.resource.parent.toString()];
     if (parent) {
-      parent.children = parent.children.filter((child) => child !== node.id);
+      parent.children = parent.children.filter(child => child !== node.id);
     }
     this.set({ ...nodes });
     return removed;
@@ -93,8 +93,8 @@ export class TreeModel {
 
   updateNode(
     node: TreeNode,
-    file: FileStat,
-  ): { node: TreeNode; replaced: Record<string, string>; removed: string[] } {
+    file: FileStat
+  ): { node: TreeNode; replaced: Record<string, string>; removed: string[]; } {
     const nodes = this.buildNodes(file);
     const replaced: Record<string, string> = {};
     const removed: string[] = [];
@@ -118,18 +118,18 @@ export class TreeModel {
     delete prevNodes[node.id];
     const newNodes = { ...prevNodes, ...nodes };
     // update the nodes
-    removed.forEach((id) => {
+    removed.forEach(id => {
       delete newNodes[id];
     });
     const parent = newNodes[newNode.file.resource.parent.toString()];
     if (parent) {
       const children = this.sortChildren(newNodes, [
         ...parent.children,
-        newNode.id,
+        newNode.id
       ]);
       newNodes[parent.id] = {
         ...parent,
-        children,
+        children
       };
     }
     this.set(newNodes);
@@ -144,11 +144,11 @@ export class TreeModel {
     while (queue.length > 0) {
       const items = [...queue];
       queue.length = 0;
-      items.forEach((node) => {
+      items.forEach(node => {
         if (node.file.isFile) {
           children.push(node);
         }
-        node.children.forEach((id) => {
+        node.children.forEach(id => {
           const child = nodes[id];
           if (child) {
             queue.push(child);
@@ -175,7 +175,7 @@ export class TreeModel {
     if (target) {
       nodes[target.id] = {
         ...target,
-        expanded,
+        expanded
       };
     }
     this.set({ ...nodes });
@@ -187,7 +187,7 @@ export class TreeModel {
     if (target) {
       nodes[target.id] = {
         ...target,
-        [target.id]: { ...target, selected },
+        [target.id]: { ...target, selected }
       };
     }
     this.set({ ...nodes });
@@ -196,13 +196,13 @@ export class TreeModel {
   traverse(
     nodes: Record<string, TreeNode>,
     node: TreeNode,
-    callback: (node: TreeNode, depth: number) => void,
+    callback: (node: TreeNode, depth: number) => void
   ) {
     const queue: [TreeNode, number][] = [[node, 0]];
     while (queue.length > 0) {
       const [node, depth] = queue.shift()!;
       callback(node, depth);
-      node.children.forEach((id) => {
+      node.children.forEach(id => {
         const child = nodes[id];
         if (child) {
           queue.push([child, depth + 1]);
@@ -213,11 +213,11 @@ export class TreeModel {
 
   private removeChild(
     nodes: Record<string, TreeNode>,
-    node: TreeNode,
+    node: TreeNode
   ): string[] {
     const removed: string[] = [node.id];
     delete nodes[node.id];
-    node.children.forEach((id) => {
+    node.children.forEach(id => {
       const child = nodes[id];
       if (child) {
         removed.push(...this.removeChild(nodes, child));
@@ -232,7 +232,7 @@ export class TreeModel {
       file,
       children: [],
       selected: false,
-      expanded: false,
+      expanded: false
     };
     return node;
   }

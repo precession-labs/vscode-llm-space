@@ -1,18 +1,17 @@
-import * as fs from 'fs/promises';
+import * as fs from "fs/promises";
 import type { ExtensionContext } from "vscode";
 
-import { v7 as uuidv7 } from 'uuid';
-import { FileType, Stat, URI } from '../filesystem/common';
-import { md5 } from '../utils/md5';
-import { Thread } from './common';
-import path = require('path');
+import { v7 as uuidv7 } from "uuid";
+import { FileType, Stat, URI } from "../filesystem/common";
+import { md5 } from "../utils/md5";
+import { Thread } from "./common";
+import path = require("path");
 
 export class ThreadService {
-
   constructor(private readonly context: ExtensionContext) {}
 
   get baseDir() {
-    return this.context.storageUri?.fsPath
+    return this.context.storageUri?.fsPath;
   }
 
   /**
@@ -22,7 +21,7 @@ export class ThreadService {
   async readThread(resource: string): Promise<Thread | null> {
     const uri = new URI(resource);
     const threadId = md5(uri.toString());
-    const prompt = await fs.readFile(uri.path.fsPath(), 'utf-8');
+    const prompt = await fs.readFile(uri.path.fsPath(), "utf-8");
     const latest = await this.getLatestSnapshotId(threadId);
     if (!latest || !this.baseDir) {
       return {
@@ -30,7 +29,7 @@ export class ThreadService {
         messages: [
           {
             id: uuidv7(),
-            role: 'system',
+            role: "system",
             content: prompt
           }
         ]
@@ -38,7 +37,7 @@ export class ThreadService {
     }
 
     await this.ensureDir(path.join(this.baseDir, threadId));
-    const content = await fs.readFile(path.join(this.baseDir, threadId, latest), 'utf-8');
+    const content = await fs.readFile(path.join(this.baseDir, threadId, latest), "utf-8");
     return JSON.parse(content);
   }
 
@@ -56,13 +55,13 @@ export class ThreadService {
     }
     const dir = path.join(this.baseDir, threadId);
     await this.ensureDir(dir);
-    const file = path.join(dir, uuidv7() + '.json');
+    const file = path.join(dir, uuidv7() + ".json");
     await fs.writeFile(file, JSON.stringify(thread, null, 2));
     return {
       name: threadId,
       type: FileType.File,
       size: 0,
-      mtime: Date.now(),
+      mtime: Date.now()
     };
   }
 
@@ -70,8 +69,8 @@ export class ThreadService {
     if (!this.baseDir) {
       return null;
     }
-    
-    console.info('baseDir', this.baseDir);
+
+    console.info("baseDir", this.baseDir);
 
     const dir = path.join(this.baseDir, threadId);
     await this.ensureDir(dir);

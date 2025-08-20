@@ -1,8 +1,8 @@
+import { OpenAI } from "openai";
+import { ChatCompletionCreateParamsStreaming } from "openai/resources";
 import type { ExtensionContext } from "vscode";
 import { Config, Model } from "../config";
 import { ConfigProvider } from "../config/providers";
-import { OpenAI } from "openai";
-import { ChatCompletionCreateParamsStreaming } from "openai/resources";
 
 export class GatewayService {
   constructor(private readonly context: ExtensionContext) {}
@@ -16,7 +16,7 @@ export class GatewayService {
 
   async createChatCompletionStream(
     params: ChatCompletionCreateParamsStreaming,
-    options: { threadId: string; provider: string }
+    options: { threadId: string; provider: string; }
   ) {
     await ConfigProvider.load(this.context.globalStorageUri.fsPath);
 
@@ -41,11 +41,11 @@ export class GatewayService {
       baseURL,
       apiKey,
       defaultHeaders: headers,
-      defaultQuery: provider.query,
+      defaultQuery: provider.query
     });
     const stream = await openai.chat.completions.create({
       ...params,
-      stream: true,
+      stream: true
     });
     return stream;
   }
@@ -54,11 +54,11 @@ export class GatewayService {
     const config = await ConfigProvider.load(
       this.context.globalStorageUri.fsPath
     );
-    const models = config.providers.flatMap((provider) =>
-      (provider.models ?? []).map((m) => {
+    const models = config.providers.flatMap(provider =>
+      (provider.models ?? []).map(m => {
         return {
           id: m.id,
-          owned_by: provider.name,
+          owned_by: provider.name
         };
       })
     );

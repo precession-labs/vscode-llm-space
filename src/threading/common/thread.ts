@@ -1,13 +1,9 @@
-import type {
-  ResponseFormatJSONObject,
-  ResponseFormatJSONSchema,
-  ResponseFormatText,
-} from "openai/resources";
+import type { ResponseFormatJSONObject, ResponseFormatJSONSchema, ResponseFormatText } from "openai/resources";
 
+import { JSONSchema } from "openai/lib/jsonschema.js";
 import type { Message } from "./messaging";
 import type { Counter } from "./tokenizing/counters";
 import type { FunctionTool } from "./tooling";
-import { JSONSchema } from 'openai/lib/jsonschema.js';
 
 /**
  * A thread is a collection of messages with a bunch of parameters.
