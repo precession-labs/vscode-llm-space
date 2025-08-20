@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
     "outDir": "dist",
-    "module": "Node16",
+    "module": "NodeNext",
     "target": "es2017",
     "declaration": false,
     "sourceMap": true,
-    "moduleResolution": "node16",
+    "moduleResolution": "NodeNext",
     "allowUnreachableCode": true,
     "experimentalDecorators": true,
     "noImplicitAny": true,

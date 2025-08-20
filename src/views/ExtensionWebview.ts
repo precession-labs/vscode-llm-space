@@ -1,10 +1,10 @@
-import * as vscode from "vscode";
 import * as rpc from "typed-rpc/server";
+import * as vscode from "vscode";
 
+import { Stream } from "openai/streaming";
 import { GatewayService } from "../gateway";
 import { ThreadService } from "../threading";
-import { Stream } from "openai/streaming";
-import { toast } from '../utils';
+import { toast } from "../utils";
 
 export class MyWebviewViewProvider implements vscode.WebviewViewProvider {
   private _webviewView?: vscode.WebviewView;
@@ -34,7 +34,7 @@ export class MyWebviewViewProvider implements vscode.WebviewViewProvider {
   }
 
   registerRpc(webview: vscode.Webview) {
-    webview.onDidReceiveMessage(async (e) => {
+    webview.onDidReceiveMessage(async e => {
       const { namespace, type, data } = e;
       if (namespace === "vls.webview.loaded") {
         this.onWebviewLoaded();
@@ -51,7 +51,7 @@ export class MyWebviewViewProvider implements vscode.WebviewViewProvider {
           {
             onError: (err: any) => {
               console.error(`RPC.ERROR[fs.${data.method}] ${data.id}`, err);
-            },
+            }
           }
         );
       } else if (namespace === "vls.rpc/gateway") {
@@ -63,7 +63,7 @@ export class MyWebviewViewProvider implements vscode.WebviewViewProvider {
         console.error(`RPC.ERROR[${namespace}.${type}] ${data.id}`, {
           namespace,
           type,
-          data,
+          data
         });
       }
 
@@ -73,19 +73,19 @@ export class MyWebviewViewProvider implements vscode.WebviewViewProvider {
             webview.postMessage({
               namespace,
               type: "json-rpc",
-              data: { id: data.id, done: false, value: chunk },
+              data: { id: data.id, done: false, value: chunk }
             });
           }
           webview.postMessage({
             namespace,
             type,
-            data: { id: data.id, done: true },
+            data: { id: data.id, done: true }
           });
         } else {
           webview.postMessage({
             namespace,
             type: "json-rpc",
-            data: result,
+            data: result
           });
         }
       }
@@ -100,8 +100,8 @@ export class MyWebviewViewProvider implements vscode.WebviewViewProvider {
       type: "command",
       data: {
         thread,
-        resource: filePath,
-      },
+        resource: filePath
+      }
     });
   }
 
