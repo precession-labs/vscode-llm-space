@@ -1,10 +1,12 @@
 import * as rpc from "typed-rpc/server";
 import * as vscode from "vscode";
 
+import path from "node:path";
 import { Stream } from "openai/streaming";
 import { GatewayService } from "../gateway";
 import { ThreadService } from "../threading";
 import { toast } from "../utils";
+import { isDev } from "../utils/env";
 
 export class MyWebviewViewProvider implements vscode.WebviewViewProvider {
   private _webviewView?: vscode.WebviewView;
@@ -19,8 +21,21 @@ export class MyWebviewViewProvider implements vscode.WebviewViewProvider {
 
   resolveWebviewView(webviewView: vscode.WebviewView): void {
     this._webviewView = webviewView;
-    webviewView.webview.options = { enableScripts: true };
-    webviewView.webview.html = this.getWebviewContent();
+    webviewView.webview.options = {
+      enableScripts: true,
+      localResourceRoots: [
+        vscode.Uri.file(path.join(this._context.extensionPath, "resources")) // 允许加载的本地资源目录
+      ]
+    };
+    const baseUri = webviewView.webview.asWebviewUri(
+      vscode.Uri.file(path.join(this._context.extensionPath, "resources"))
+    );
+
+    if (isDev) {
+      webviewView.webview.html = this.buildDevHtml();
+    } else {
+      webviewView.webview.html = this.buildProdHtml(webviewView.webview.cspSource, baseUri);
+    }
     this.registerRpc(webviewView.webview);
   }
 
@@ -105,7 +120,31 @@ export class MyWebviewViewProvider implements vscode.WebviewViewProvider {
     });
   }
 
-  private getWebviewContent(): string {
+  private buildProdHtml(cspSource: string, baseUri: vscode.Uri): string {
+    const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
+    return `
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src none; script-src ${cspSource} 'unsafe-eval'; style-src ${cspSource} 'unsafe-inline';">
+  <base href="${baseUri}/">
+  <title>LLM Space Extension</title>
+  <link rel="stylesheet" href="extension.css" nonce="${nonce}">
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="extension.js" nonce="${nonce}"></script>
+</body>
+
+</html>
+    `;
+  }
+
+  private buildDevHtml(): string {
     return `
 <!DOCTYPE html>
 <html>
@@ -114,6 +153,7 @@ export class MyWebviewViewProvider implements vscode.WebviewViewProvider {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LLM Space Extension</title>
+
 </head>
 
 <body>

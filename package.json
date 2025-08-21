@@ -8,6 +8,10 @@
     "name": "precession-labs",
     "url": "https://github.com/precession-labs"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/precession-labs/vscode-llm-space"
+  },
   "homepage": "https://github.com/precession-labs/vscode-llm-space",
   "bugs": "https://github.com/precession-labs/vscode-llm-space/issues",
   "license": "MIT",
@@ -17,7 +21,7 @@
     "vscode": "^1.84.0"
   },
   "categories": [
-    "Other"
+    "AI"
   ],
   "keywords": [
     "llm",
@@ -115,7 +119,7 @@
     "@typescript-eslint/parser": "^8.39.1",
     "cross-env": "^10.0.0",
     "dprint": "^0.50.1",
-    "eslint": "^9.33.0",
+    "eslint": "^8",
     "eslint-config-zoro": "^6.1.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-webpack-plugin": "^5.0.2",

@@ -1,6 +1,5 @@
 const fs = require("fs");
 const path = require("path");
-const ESLintPlugin = require("eslint-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 const Webpackbar = require("webpackbar");
@@ -14,31 +13,31 @@ module.exports = {
   mode: "production",
   target: "node",
   node: {
-    __dirname: false
+    __dirname: false,
   },
   entry: {
-    extension: ["./src/extension"]
+    extension: ["./src/extension"],
   },
   optimization: {
     minimizer: [
       new TerserPlugin({
         extractComments: false,
         terserOptions: {
-          format: { comments: false }
-        }
-      })
-    ]
+          format: { comments: false },
+        },
+      }),
+    ],
   },
   output: {
     path: BUILD_PATH,
     filename: "[name].js",
-    libraryTarget: "commonjs2"
+    libraryTarget: "commonjs2",
   },
   resolve: {
-    extensions: [".ts", ".js"]
+    extensions: [".ts", ".js"],
   },
   externals: {
-    "vscode": "commonjs vscode"
+    vscode: "commonjs vscode",
   },
   module: {
     rules: [
@@ -47,20 +46,16 @@ module.exports = {
         use: [
           {
             loader: "ts-loader",
-            options: { transpileOnly: true }
-          }
+            options: { transpileOnly: true },
+          },
         ],
-        exclude: /node_modules/
-      }
-    ]
+        exclude: /node_modules/,
+      },
+    ],
   },
-  plugins: [
-    new ESLintPlugin(),
-    new ForkTsCheckerWebpackPlugin(),
-    new Webpackbar()
-  ],
+  plugins: [new ForkTsCheckerWebpackPlugin(), new Webpackbar()],
   stats: {
     children: false,
-    modules: false
-  }
+    modules: false,
+  },
 };
