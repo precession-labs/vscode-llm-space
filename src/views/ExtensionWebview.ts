@@ -1,8 +1,9 @@
+import { randomUUID } from "node:crypto";
+import path from "node:path";
+import { Stream } from "openai/streaming";
 import * as rpc from "typed-rpc/server";
 import * as vscode from "vscode";
 
-import path from "node:path";
-import { Stream } from "openai/streaming";
 import { GatewayService } from "../gateway";
 import { ThreadService } from "../threading";
 import { toast } from "../utils";
@@ -46,7 +47,7 @@ export class MyWebviewViewProvider implements vscode.WebviewViewProvider {
 
     const currentDocument = vscode.window.activeTextEditor?.document;
     if (currentDocument && currentDocument.languageId === "markdown") {
-      this.open(currentDocument.uri.fsPath);
+      this.open(currentDocument.uri.fsPath).catch(() => {});
     }
   }
 
@@ -70,7 +71,12 @@ export class MyWebviewViewProvider implements vscode.WebviewViewProvider {
 
   registerRpc(webview: vscode.Webview) {
     webview.onDidReceiveMessage(async e => {
-      const { namespace, type, data } = e;
+      // TODO: fix type.
+      const { namespace, type, data } = e as {
+        namespace: string;
+        type: string;
+        data: Record<string, any>;
+      };
       if (namespace === "vls.event.webview.loaded") {
         this.onWebviewLoaded();
         return;
@@ -133,7 +139,7 @@ export class MyWebviewViewProvider implements vscode.WebviewViewProvider {
   }
 
   async open(filePath: string) {
-    console.log("[extension] open file", filePath);
+    // console.log("[extension] open file", filePath);
     const thread = await this._threadService.readThread(filePath);
     this._webviewView?.webview.postMessage({
       namespace: "vls.command.open",
@@ -147,7 +153,7 @@ export class MyWebviewViewProvider implements vscode.WebviewViewProvider {
   }
 
   private buildProdHtml(cspSource: string, baseUri: vscode.Uri): string {
-    const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
+    const nonce = Buffer.from(randomUUID()).toString("base64");
     return `
 <!DOCTYPE html>
 <html>
@@ -156,7 +162,7 @@ export class MyWebviewViewProvider implements vscode.WebviewViewProvider {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="default-src none; script-src ${cspSource} 'unsafe-eval'; style-src ${cspSource} 'unsafe-inline'; img-src * data:;">
-  <base href="${baseUri}/">
+  <base href="${baseUri.toString()}/">
   <title>LLM Space Extension</title>
   <link rel="stylesheet" href="extension.css" nonce="${nonce}">
 </head>

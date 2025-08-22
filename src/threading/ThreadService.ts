@@ -1,12 +1,13 @@
 import * as fs from "fs/promises";
+import path from "node:path";
+import { v7 as generateUUID } from "uuid";
 import type { ExtensionContext } from "vscode";
 
-import { v7 as uuidv7 } from "uuid";
-import { FileType, Stat, URI } from "../filesystem/common";
-import { md5 } from "../utils/md5";
-import { Thread } from "./common";
-import path = require("path");
 import { ConfigProvider } from "../config/providers";
+import type { Stat } from "../filesystem/common";
+import { FileType, URI } from "../filesystem/common";
+import { md5 } from "../utils/md5";
+import type { Thread } from "./common";
 
 export class ThreadService {
   constructor(private readonly context: ExtensionContext) {}
@@ -33,7 +34,7 @@ export class ThreadService {
         top_p: 1,
         messages: [
           {
-            id: uuidv7(),
+            id: generateUUID(),
             role: "system",
             content: prompt
           }
@@ -41,12 +42,12 @@ export class ThreadService {
       };
     }
 
-    await this.ensureDir(path.join(this.baseDir, threadId));
+    await this._ensureDir(path.join(this.baseDir, threadId));
     const content = await fs.readFile(path.join(this.baseDir, threadId, latest), "utf-8");
     const thread = JSON.parse(content) as Thread;
     if (thread.messages.length === 0) {
       thread.messages.push({
-        id: uuidv7(),
+        id: generateUUID(),
         role: "system",
         content: prompt
       });
@@ -72,8 +73,8 @@ export class ThreadService {
       return null;
     }
     const dir = path.join(this.baseDir, threadId);
-    await this.ensureDir(dir);
-    const file = path.join(dir, uuidv7() + ".json");
+    await this._ensureDir(dir);
+    const file = path.join(dir, `${generateUUID()}.json`);
     await fs.writeFile(file, JSON.stringify(thread, null, 2));
     return {
       name: threadId,
@@ -89,7 +90,7 @@ export class ThreadService {
     }
 
     const dir = path.join(this.baseDir, threadId);
-    await this.ensureDir(dir);
+    await this._ensureDir(dir);
     const files = await fs.readdir(dir);
     if (files.length === 0) {
       return null;
@@ -97,11 +98,11 @@ export class ThreadService {
     return files.sort().pop() ?? null;
   }
 
-  private async ensureDir(path: string) {
+  private async _ensureDir(_path: string) {
     try {
-      await fs.stat(path);
+      await fs.stat(_path);
     } catch {
-      await fs.mkdir(path, { recursive: true });
+      await fs.mkdir(_path, { recursive: true });
     }
   }
 }

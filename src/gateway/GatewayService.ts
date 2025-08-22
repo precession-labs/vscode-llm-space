@@ -1,31 +1,26 @@
 import { OpenAI } from "openai";
-import { ChatCompletionCreateParamsStreaming } from "openai/resources";
+import type { ChatCompletionCreateParamsStreaming } from "openai/resources";
 import type { ExtensionContext } from "vscode";
-import { Config, Model } from "../config";
+import type { Config, Model } from "../config";
 import { ConfigProvider } from "../config/providers";
 
 export class GatewayService {
   constructor(private readonly context: ExtensionContext) {}
 
   async getProviders(): Promise<Config> {
-    const config = await ConfigProvider.load(
-      this.context.globalStorageUri.fsPath
-    );
-    return config;
+    return ConfigProvider.load(this.context.globalStorageUri.fsPath);
   }
 
   async createChatCompletionStream(
     params: ChatCompletionCreateParamsStreaming,
-    options: { threadId: string; provider: string; }
+    options: { threadId: string; provider?: string; }
   ) {
-    await ConfigProvider.load(this.context.globalStorageUri.fsPath);
+    ConfigProvider.load(this.context.globalStorageUri.fsPath);
 
-    const provider = ConfigProvider.get(
-      options.provider ?? ConfigProvider.defaults.provider ?? ""
-    );
+    const provider = ConfigProvider.get(options.provider ?? ConfigProvider.defaults.provider ?? "");
     const baseURL = provider.baseURL;
     const apiKey = provider.apiKey ?? "NO_API_KEY";
-    const headers = Object.keys(provider.headers ?? {}).reduce(
+    const headers = Object.keys(provider.headers ?? {}).reduce<Record<string, string>>(
       (acc: Record<string, string>, key) => {
         const value = provider.headers?.[key]?.trim();
         if (value?.startsWith("${") && value.endsWith("}")) {
@@ -35,7 +30,7 @@ export class GatewayService {
         }
         return acc;
       },
-      {} as Record<string, string>
+      {}
     );
     const openai = new OpenAI({
       baseURL,
@@ -43,7 +38,7 @@ export class GatewayService {
       defaultHeaders: headers,
       defaultQuery: provider.query
     });
-    console.log(`[gateway] ${provider.name}/${params.model} chat completion request.`, params);
+    // console.log(`[gateway] ${provider.name}/${params.model} chat completion request.`, params);
     const stream = await openai.chat.completions.create({
       ...params,
       stream: true
@@ -51,22 +46,21 @@ export class GatewayService {
     return stream;
   }
 
-  saveProviders(config: Config): Promise<Config> {
+  async saveProviders(config: Config): Promise<Config> {
     ConfigProvider.update(config);
     return Promise.resolve(config);
   }
 
   async getModels(): Promise<Model[]> {
-    const config = await ConfigProvider.load(
-      this.context.globalStorageUri.fsPath
-    );
-    const models = config.providers.flatMap(provider =>
-      (provider.models ?? []).map(m => {
-        return {
-          id: m.id,
-          owned_by: provider.name
-        };
-      })
+    const config = ConfigProvider.load(this.context.globalStorageUri.fsPath);
+    const models = config.providers.flatMap(
+      provider =>
+        (provider.models ?? []).map(m => {
+          return {
+            id: m.id,
+            owned_by: provider.name
+          };
+        })
     );
     return models;
   }

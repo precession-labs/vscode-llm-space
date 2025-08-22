@@ -8,11 +8,11 @@ export interface GenericMessage<R extends string, C> {
 
 export interface SystemMessage extends GenericMessage<"system", string> {}
 
-export interface UserMessage extends GenericMessage<"user", string | Array<ChatCompletionContentPart>> {}
+export interface UserMessage extends GenericMessage<"user", string | ChatCompletionContentPart[]> {}
 
 export interface AssistantMessage extends GenericMessage<"assistant", string | null> {
   reasoning_content?: string;
-  tool_calls?: Array<ChatCompletionMessageToolCall>;
+  tool_calls?: ChatCompletionMessageToolCall[];
 }
 
 export interface ToolMessage extends GenericMessage<"tool", string> {

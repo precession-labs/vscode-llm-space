@@ -1,4 +1,4 @@
-import { type URI } from "./URI";
+import type { URI } from "./URI";
 
 export enum FileType {
   File = "file",

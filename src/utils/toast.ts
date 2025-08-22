@@ -76,15 +76,13 @@ export function showSpinner(message: string, progress?: number, total?: number):
     text = `[${progress}/${total}]`;
   }
 
-  if (message != null) {
-    text = text ? `${text} ${message}` : `${message}`;
-  }
+  text = text ? `${text} ${message}` : message;
 
   if (text) {
     text = ` ${text.trim()}`;
   }
 
-  let step: number = 0;
+  let step = 0;
   const frames: string[] = spinner.frames;
   const length: number = frames.length;
   spinnerTimer = setInterval(() => {

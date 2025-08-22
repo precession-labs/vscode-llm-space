@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import type { ExtensionContext } from "vscode";
 
-import { api, toast } from "./utils";
+import { api } from "./utils";
 import { MyWebviewViewProvider } from "./views";
 
 export async function activate(context: ExtensionContext) {
@@ -23,7 +23,6 @@ function _registerCommands(
   context: ExtensionContext,
   viewProvider: MyWebviewViewProvider
 ) {
-  api.registerCommand(context, "vls.log", _log);
   api.registerCommand(context, "vls.openWebview", async (uri?: vscode.Uri) => {
     const targetFile = uri?.fsPath ?? vscode.window.activeTextEditor?.document.uri.fsPath;
     if (!targetFile) {
@@ -34,10 +33,7 @@ function _registerCommands(
   });
 }
 
-function _registerFileWatcher(
-  context: ExtensionContext,
-  viewProvider: MyWebviewViewProvider
-) {
+function _registerFileWatcher(context: ExtensionContext, viewProvider: MyWebviewViewProvider) {
   const disposable = vscode.window.onDidChangeActiveTextEditor(
     async editor => {
       if (editor && editor.document.languageId === "markdown") {
@@ -47,9 +43,4 @@ function _registerFileWatcher(
     }
   );
   context.subscriptions.push(disposable);
-}
-
-function _log() {
-  console.log("vls log!!");
-  toast.statusInfo("Hello World");
 }

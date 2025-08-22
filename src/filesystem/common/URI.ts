@@ -3,6 +3,17 @@ import { URI as Uri } from "vscode-uri";
 import { Path } from "./path";
 
 export class URI {
+  private readonly codeUri: Uri;
+  private _path: Path | undefined;
+
+  constructor(uri: string | Uri = "") {
+    if (uri instanceof Uri) {
+      this.codeUri = uri;
+    } else {
+      this.codeUri = Uri.parse(uri);
+    }
+  }
+
   public static fromComponents(components: UriComponents): URI;
   public static fromComponents(components: undefined): undefined;
   public static fromComponents(
@@ -15,15 +26,18 @@ export class URI {
     return new URI(Uri.file(path));
   }
 
-  private readonly codeUri: Uri;
-  private _path: Path | undefined;
-
-  constructor(uri: string | Uri = "") {
-    if (uri instanceof Uri) {
-      this.codeUri = uri;
-    } else {
-      this.codeUri = Uri.parse(uri);
-    }
+  public static getDistinctParents(uris: URI[]): URI[] {
+    const result: URI[] = [];
+    uris.forEach((uri, i) => {
+      if (
+        !uris.some(
+          (otherUri, index) => index !== i && otherUri.isEqualOrParent(uri)
+        )
+      ) {
+        result.push(uri);
+      }
+    });
+    return result;
   }
 
   /**
@@ -191,7 +205,9 @@ export class URI {
   }
 
   get path(): Path {
-    this._path ??= new Path(this.codeUri.path);
+    if (this._path == null) {
+      this._path = new Path(this.codeUri.path);
+    }
     return this._path;
   }
 
@@ -230,24 +246,6 @@ export class URI {
     return left.isEqualOrParent(right);
   }
 
-  static getDistinctParents(uris: URI[]): URI[] {
-    const result: URI[] = [];
-    uris.forEach((uri, i) => {
-      if (
-        !uris.some(
-          (otherUri, index) => index !== i && otherUri.isEqualOrParent(uri)
-        )
-      ) {
-        result.push(uri);
-      }
-    });
-    return result;
-  }
-
-  private hasSameOrigin(uri: URI): boolean {
-    return this.authority === uri.authority && this.scheme === uri.scheme;
-  }
-
   toComponents(): UriComponents {
     return {
       scheme: this.scheme,
@@ -256,6 +254,10 @@ export class URI {
       query: this.query,
       fragment: this.fragment
     };
+  }
+
+  private hasSameOrigin(uri: URI): boolean {
+    return this.authority === uri.authority && this.scheme === uri.scheme;
   }
 }
 

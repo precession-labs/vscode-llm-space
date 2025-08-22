@@ -1,5 +1,4 @@
 import type { Thread } from "../../threading/common";
-
 import type { Stat } from "./files";
 
 export interface RemoteFileSystemServer {

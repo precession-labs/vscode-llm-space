@@ -33,7 +33,7 @@ export function updateMessageCounter(
   messageId: string,
   updates: Partial<MessageCounter>
 ): void {
-  counter.messages[messageId] ??= {
+  counter.messages[messageId] = counter.messages[messageId] ?? {
     token_used: 0,
     latency: {}
   };
@@ -55,13 +55,8 @@ export function updateMessageCounter(
 /**
  * Initialize counter if it doesn't exist
  */
-export function ensureCounter(thread: {
-  extra?: { counter?: Counter; };
-}): Counter {
-  thread.extra ??= {};
-  thread.extra.counter ??= {
-    messages: {}
-  };
-
+export function ensureCounter(thread: { extra?: { counter?: Counter; }; }): Counter {
+  thread.extra = thread.extra ?? {};
+  thread.extra.counter = thread.extra.counter ?? { messages: {} };
   return thread.extra.counter;
 }

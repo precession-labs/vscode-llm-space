@@ -16,7 +16,7 @@ export const ConfigProvider = {
   load(basePath: string) {
     const filePath = join(basePath, "config.yaml");
     this._path = filePath;
-    this._config ??= loadYamlConfig(filePath);
+    this._config = this._config ?? loadYamlConfig(filePath);
     return this._config;
   },
 
@@ -37,7 +37,7 @@ export const ConfigProvider = {
   },
 
   get all() {
-    return this.config?.providers ?? [];
+    return this.config.providers;
   },
 
   get defaults() {
