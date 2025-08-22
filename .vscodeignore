@@ -1,21 +1,21 @@
 # Node files
 node_modules/**
-yarn.lock
 
 # Editor files
 .vscode/**
 
 # Configuration files
-.eslintignore
-.eslintrc
+.husky/**
 .gitignore
-.lintstagedrc
+dprint.json
+eslint.config.mjs
 tsconfig.eslint.json
 tsconfig.json
 
 # Project specific stuff
 .github/**
 docs/**
+prompts/**
 scripts/**
 src/**
 tests/**

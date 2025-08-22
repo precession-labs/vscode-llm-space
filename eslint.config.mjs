@@ -1,47 +1,31 @@
-import { FlatCompat } from "@eslint/eslintrc";
-import eslint from "@eslint/js";
-import { defineConfig, globalIgnores } from "eslint/config";
+import { ESLINT_CONFIGS } from "eslint-config-zoro/eslint";
+import { NODE_CONFIGS } from "eslint-config-zoro/node";
+import { STYLISTIC_CONFIGS } from "eslint-config-zoro/stylistic";
+import { TYPESCRIPT_CONFIGS } from "eslint-config-zoro/typescript";
 import * as globals from "globals";
-import * as path from "node:path";
-import { fileURLToPath } from "node:url";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-  recommendedConfig: eslint.configs.recommended,
-  allConfig: eslint.configs.all,
-});
-
-export default defineConfig([
-  globalIgnores(["**/dist"]),
+export default [
+  { ignores: ["dist/*", "resources/*"] },
+  ...ESLINT_CONFIGS,
+  ...NODE_CONFIGS,
+  ...STYLISTIC_CONFIGS,
+  ...TYPESCRIPT_CONFIGS,
   {
-    extends: compat.extends(
-      "eslint-config-zoro/eslint",
-      "eslint-config-zoro/typescript",
-      "eslint-config-zoro/node"
-    ),
     languageOptions: {
       globals: {
         ...globals.node,
-        ...globals.jest,
+        ...globals.jest
       },
       ecmaVersion: 5,
       sourceType: "commonjs",
       parserOptions: {
-        project: "./tsconfig.eslint.json",
-      },
+        project: "./tsconfig.eslint.json"
+      }
     },
     rules: {
-      "@typescript-eslint/naming-convention": [
-        "error",
-        {
-          selector: "variable",
-          format: ["camelCase", "PascalCase", "snake_case", "UPPER_CASE"],
-          leadingUnderscore: "allow",
-          trailingUnderscore: "forbid",
-        },
-      ],
-    },
-  },
-]);
+      "@stylistic/brace-style": ["error", "1tbs", { "allowSingleLine": true }],
+      "@stylistic/indent-binary-ops": ["error", 2],
+      "@stylistic/indent": ["error", 2, { "SwitchCase": 1 }]
+    }
+  }
+];
