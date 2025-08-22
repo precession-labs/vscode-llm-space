@@ -69,13 +69,9 @@
     },
     "commands": [
       {
-        "command": "vls.log",
-        "title": "%commands.log%",
-        "category": "LLM Space"
-      },
-      {
         "command": "vls.openWebview",
-        "title": "%commands.openWebview%"
+        "title": "%commands.openWebview%",
+        "category": "LLM Space"
       }
     ],
     "configuration": [],
