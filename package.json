@@ -16,7 +16,7 @@
   "bugs": "https://github.com/precession-labs/vscode-llm-space/issues",
   "license": "MIT",
   "main": "dist/extension",
-  "icon": "resources/logo.png",
+  "icon": "resources/llm-logo.png",
   "engines": {
     "vscode": "^1.84.0"
   },
