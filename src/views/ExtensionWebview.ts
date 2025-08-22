@@ -13,6 +13,7 @@ export class MyWebviewViewProvider implements vscode.WebviewViewProvider {
 
   private readonly _threadService: ThreadService;
   private readonly _gatewayService: GatewayService;
+  private _activeFile?: string;
 
   constructor(private readonly _context: vscode.ExtensionContext) {
     this._threadService = new ThreadService(this._context);
@@ -37,6 +38,7 @@ export class MyWebviewViewProvider implements vscode.WebviewViewProvider {
       webviewView.webview.html = this.buildProdHtml(webviewView.webview.cspSource, baseUri);
     }
     this.registerRpc(webviewView.webview);
+    this.registerFileWatcher(webviewView.webview);
   }
 
   onWebviewLoaded() {
@@ -48,10 +50,28 @@ export class MyWebviewViewProvider implements vscode.WebviewViewProvider {
     }
   }
 
+  registerFileWatcher(webview: vscode.Webview) {
+    this._context.subscriptions.push(
+      vscode.workspace.onDidChangeTextDocument(event => {
+        const changedFile = event.document.uri.fsPath;
+        if (changedFile === this._activeFile) {
+          webview.postMessage({
+            namespace: "vls.event.file.changed",
+            type: "event",
+            data: {
+              resource: changedFile,
+              content: event.document.getText()
+            }
+          });
+        }
+      })
+    );
+  }
+
   registerRpc(webview: vscode.Webview) {
     webview.onDidReceiveMessage(async e => {
       const { namespace, type, data } = e;
-      if (namespace === "vls.webview.loaded") {
+      if (namespace === "vls.event.webview.loaded") {
         this.onWebviewLoaded();
         return;
       }
@@ -84,6 +104,11 @@ export class MyWebviewViewProvider implements vscode.WebviewViewProvider {
 
       if (result) {
         if ("result" in result && result.result instanceof Stream) {
+          webview.postMessage({
+            namespace,
+            type: "json-rpc",
+            data: { id: data.id, stream: true }
+          });
           for await (const chunk of result.result) {
             webview.postMessage({
               namespace,
@@ -108,7 +133,7 @@ export class MyWebviewViewProvider implements vscode.WebviewViewProvider {
   }
 
   async open(filePath: string) {
-    console.log("open file", filePath);
+    console.log("[extension] open file", filePath);
     const thread = await this._threadService.readThread(filePath);
     this._webviewView?.webview.postMessage({
       namespace: "vls.command.open",
@@ -118,6 +143,7 @@ export class MyWebviewViewProvider implements vscode.WebviewViewProvider {
         resource: filePath
       }
     });
+    this._activeFile = filePath;
   }
 
   private buildProdHtml(cspSource: string, baseUri: vscode.Uri): string {
@@ -129,7 +155,7 @@ export class MyWebviewViewProvider implements vscode.WebviewViewProvider {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src none; script-src ${cspSource} 'unsafe-eval'; style-src ${cspSource} 'unsafe-inline';">
+  <meta http-equiv="Content-Security-Policy" content="default-src none; script-src ${cspSource} 'unsafe-eval'; style-src ${cspSource} 'unsafe-inline'; img-src * data:;">
   <base href="${baseUri}/">
   <title>LLM Space Extension</title>
   <link rel="stylesheet" href="extension.css" nonce="${nonce}">
@@ -153,7 +179,6 @@ export class MyWebviewViewProvider implements vscode.WebviewViewProvider {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LLM Space Extension</title>
-
 </head>
 
 <body>

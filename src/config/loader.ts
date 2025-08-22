@@ -5,7 +5,7 @@ import { dump, load } from "js-yaml";
 import type { Config } from "./config";
 
 export const loadYamlConfig = (configFile: string) => {
-  console.log("loadYamlConfig", configFile);
+  console.log("[config] load config from", configFile);
   const config = load(fs.readFileSync(configFile, "utf8")) ?? { providers: [] };
   return config as Config;
 };

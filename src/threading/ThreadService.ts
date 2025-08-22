@@ -29,6 +29,8 @@ export class ThreadService {
         id: threadId,
         model: ConfigProvider.defaults.model,
         model_provider: ConfigProvider.defaults.provider,
+        temperature: 1,
+        top_p: 1,
         messages: [
           {
             id: uuidv7(),
@@ -41,7 +43,20 @@ export class ThreadService {
 
     await this.ensureDir(path.join(this.baseDir, threadId));
     const content = await fs.readFile(path.join(this.baseDir, threadId, latest), "utf-8");
-    return JSON.parse(content);
+    const thread = JSON.parse(content) as Thread;
+    if (thread.messages.length === 0) {
+      thread.messages.push({
+        id: uuidv7(),
+        role: "system",
+        content: prompt
+      });
+    } else {
+      const system = thread.messages.find(m => m.role === "system");
+      if (system) {
+        system.content = prompt;
+      }
+    }
+    return thread;
   }
 
   /**
@@ -72,8 +87,6 @@ export class ThreadService {
     if (!this.baseDir) {
       return null;
     }
-
-    console.info("baseDir", this.baseDir);
 
     const dir = path.join(this.baseDir, threadId);
     await this.ensureDir(dir);

@@ -43,6 +43,7 @@ export class GatewayService {
       defaultHeaders: headers,
       defaultQuery: provider.query
     });
+    console.log(`[gateway] ${provider.name}/${params.model} chat completion request.`, params);
     const stream = await openai.chat.completions.create({
       ...params,
       stream: true
