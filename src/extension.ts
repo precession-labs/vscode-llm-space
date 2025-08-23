@@ -37,7 +37,6 @@ function _registerFileWatcher(context: ExtensionContext, viewProvider: MyWebview
   const disposable = vscode.window.onDidChangeActiveTextEditor(
     async editor => {
       if (editor && editor.document.languageId === "markdown") {
-        await vscode.commands.executeCommand("vls_container_webview.focus");
         await viewProvider.open(editor.document.uri.fsPath);
       }
     }

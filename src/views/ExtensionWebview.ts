@@ -14,6 +14,7 @@ export class MyWebviewViewProvider implements vscode.WebviewViewProvider {
 
   private readonly _threadService: ThreadService;
   private readonly _gatewayService: GatewayService;
+  private _isReady = false;
   private _activeFile?: string;
 
   constructor(private readonly _context: vscode.ExtensionContext) {
@@ -44,7 +45,7 @@ export class MyWebviewViewProvider implements vscode.WebviewViewProvider {
 
   onWebviewLoaded() {
     toast.statusInfo("LLM Space is ready");
-
+    this._isReady = true;
     const currentDocument = vscode.window.activeTextEditor?.document;
     if (currentDocument && currentDocument.languageId === "markdown") {
       this.open(currentDocument.uri.fsPath).catch(() => {});
@@ -139,7 +140,9 @@ export class MyWebviewViewProvider implements vscode.WebviewViewProvider {
   }
 
   async open(filePath: string) {
-    // console.log("[extension] open file", filePath);
+    if (!this._isReady) {
+      await vscode.commands.executeCommand("vls_container_webview.focus");
+    }
     const thread = await this._threadService.readThread(filePath);
     this._webviewView?.webview.postMessage({
       namespace: "vls.command.open",
@@ -164,12 +167,12 @@ export class MyWebviewViewProvider implements vscode.WebviewViewProvider {
   <meta http-equiv="Content-Security-Policy" content="default-src none; script-src ${cspSource} 'unsafe-eval'; style-src ${cspSource} 'unsafe-inline'; img-src * data:;">
   <base href="${baseUri.toString()}/">
   <title>LLM Space Extension</title>
-  <link rel="stylesheet" href="extension.css" nonce="${nonce}">
+  <link rel="stylesheet" href="web/index.css" nonce="${nonce}">
 </head>
 
 <body>
   <div id="root"></div>
-  <script type="module" src="extension.js" nonce="${nonce}"></script>
+  <script type="module" src="web/index.js" nonce="${nonce}"></script>
 </body>
 
 </html>
