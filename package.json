@@ -115,7 +115,7 @@
     "cross-env": "^10.0.0",
     "dprint": "^0.50.1",
     "eslint": "^9.33.0",
-    "eslint-config-zoro": "^7.1.7",
+    "eslint-config-zoro": "^7.1.8",
     "eslint-plugin-n": "^17.21.3",
     "eslint-webpack-plugin": "^5.0.2",
     "fork-ts-checker-webpack-plugin": "^9.1.0",
