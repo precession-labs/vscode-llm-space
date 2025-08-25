@@ -1,12 +1,12 @@
 # VSCode LLM Space
 
 <p align="center">
-  <img src="./docs/demo.gif" width="100%" />
+  <img alt="Demo" src="./docs/demo.gif" width="100%" />
 </p>
 
 LLM Space is an AI context engineering develop assistant.
 
-## Core Features
+## Features
 
 ### 🤖 AI Chat Assistant
 
@@ -30,7 +30,7 @@ LLM Space is an AI context engineering develop assistant.
 ## Provider configuration
 
 <p align="center">
-  <img src="./docs/config.gif" width="100%" />
+  <img alt="Config" src="./docs/config.gif" width="100%" />
 </p>
 
 ## Develop
