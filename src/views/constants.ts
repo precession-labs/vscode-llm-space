@@ -1,0 +1,2 @@
+export const MAIN_WEBVIEW_VIEW_PROVIDER_VIEW_ID = "vls_container_webview";
+export const MAIN_WEBVIEW_VIEW_PROVIDER_COMMAND_FOCUS = `${MAIN_WEBVIEW_VIEW_PROVIDER_VIEW_ID}.focus`;
