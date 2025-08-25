@@ -3,6 +3,7 @@
   "editor.tabSize": 2,
   "search.exclude": {
     "**/dist": true,
+    "**/resources/web": true,
     "**/pnpm-lock.yaml": true,
     "**/examples/**/*.json": true
   },
