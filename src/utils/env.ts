@@ -1,1 +1,1 @@
-export const isDev = process.env.IS_DEV === "true";
+export const IS_DEV = process.env.IS_DEV === "true";
