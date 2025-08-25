@@ -4,22 +4,26 @@ import { dump, load } from "js-yaml";
 
 import type { Config } from "./config";
 
-export const loadYamlConfig = (configFile: string) => {
-  // console.log("[config] load config from", configFile);
-  const config = load(fs.readFileSync(configFile, "utf8")) ?? { providers: [] };
-  return config as Config;
-};
+export function loadConfig(filepath: string): Config {
+  try {
+    // console.log("[config] load config from", configFile);
+    return load(fs.readFileSync(filepath, "utf8")) as Config;
+  } catch {
+    // console.error(e);
+    return { providers: [] };
+  }
+}
 
-export const saveYamlConfig = (config: Config, configFile: string) => {
+export function saveConfig(filepath: string, config: Config) {
   try {
     // 确保目标目录存在
-    const dir = configFile.substring(0, configFile.lastIndexOf("/"));
+    const dir = filepath.substring(0, filepath.lastIndexOf("/"));
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
     }
-    fs.writeFileSync(configFile, dump(config, { indent: 2 }));
+    fs.writeFileSync(filepath, dump(config, { indent: 2 }));
   } catch (e) {
     // console.error(e);
     throw e;
   }
-};
+}

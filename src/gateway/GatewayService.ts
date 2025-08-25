@@ -1,27 +1,47 @@
 import { OpenAI } from "openai";
 import type { ChatCompletionCreateParamsStreaming } from "openai/resources";
-import type { ExtensionContext } from "vscode";
-import type { Config, Model } from "../config";
-import { ConfigProvider } from "../config/providers";
+
+import type { Config, ConfigProvider, Model } from "../config";
 
 export class GatewayService {
-  constructor(private readonly context: ExtensionContext) {}
+  private readonly _configProvider: ConfigProvider;
 
-  async getProviders(): Promise<Config> {
-    return ConfigProvider.load(this.context.globalStorageUri.fsPath);
+  constructor(configProvider: ConfigProvider) {
+    this._configProvider = configProvider;
+  }
+
+  async getProviders() {
+    return this._configProvider.config;
+  }
+
+  async saveProviders(config: Config): Promise<Config> {
+    return this._configProvider.save(config);
+  }
+
+  async getModels(): Promise<Model[]> {
+    return this._configProvider.config.providers.flatMap(
+      provider =>
+        (provider.models ?? []).map(m => {
+          return {
+            id: m.id,
+            owned_by: provider.name
+          };
+        })
+    );
   }
 
   async createChatCompletionStream(
     params: ChatCompletionCreateParamsStreaming,
     options: { threadId: string; provider?: string; }
   ) {
-    ConfigProvider.load(this.context.globalStorageUri.fsPath);
+    const providerName = options.provider ?? this._configProvider.config.provider ?? "";
+    const provider = this._configProvider.get(providerName);
+    if (!provider) {
+      throw new Error(`Provider ${providerName} not found`);
+    }
 
-    const provider = ConfigProvider.get(options.provider ?? ConfigProvider.defaults.provider ?? "");
-    const baseURL = provider.baseURL;
-    const apiKey = provider.apiKey ?? "NO_API_KEY";
     const headers = Object.keys(provider.headers ?? {}).reduce<Record<string, string>>(
-      (acc: Record<string, string>, key) => {
+      (acc, key) => {
         const value = provider.headers?.[key]?.trim();
         if (value?.startsWith("${") && value.endsWith("}")) {
           acc[key] = process.env[value.slice(2, -1)] ?? "";
@@ -33,35 +53,15 @@ export class GatewayService {
       {}
     );
     const openai = new OpenAI({
-      baseURL,
-      apiKey,
+      baseURL: provider.baseURL,
+      apiKey: provider.apiKey ?? "NO_API_KEY",
       defaultHeaders: headers,
       defaultQuery: provider.query
     });
     // console.log(`[gateway] ${provider.name}/${params.model} chat completion request.`, params);
-    const stream = await openai.chat.completions.create({
+    return await openai.chat.completions.create({
       ...params,
       stream: true
     });
-    return stream;
-  }
-
-  async saveProviders(config: Config): Promise<Config> {
-    ConfigProvider.update(config);
-    return Promise.resolve(config);
-  }
-
-  async getModels(): Promise<Model[]> {
-    const config = ConfigProvider.load(this.context.globalStorageUri.fsPath);
-    const models = config.providers.flatMap(
-      provider =>
-        (provider.models ?? []).map(m => {
-          return {
-            id: m.id,
-            owned_by: provider.name
-          };
-        })
-    );
-    return models;
   }
 }

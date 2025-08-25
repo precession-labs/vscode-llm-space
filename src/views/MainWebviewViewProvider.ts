@@ -4,14 +4,16 @@ import { Stream } from "openai/streaming";
 import * as rpc from "typed-rpc/server";
 import * as vscode from "vscode";
 
+import { ConfigProvider } from "../config";
 import { GatewayService } from "../gateway";
 import { ThreadService } from "../threading";
 import { env, toast } from "../utils";
+import { MAIN_WEBVIEW_VIEW_PROVIDER_COMMAND_FOCUS } from "./constants";
 
 export class MainWebviewViewProvider implements vscode.WebviewViewProvider {
   private readonly _context: vscode.ExtensionContext;
-  private readonly _threadService: ThreadService;
   private readonly _gatewayService: GatewayService;
+  private readonly _threadService: ThreadService;
 
   private _isReady = false;
   private _activeFile?: string;
@@ -19,8 +21,9 @@ export class MainWebviewViewProvider implements vscode.WebviewViewProvider {
 
   constructor(context: vscode.ExtensionContext) {
     this._context = context;
-    this._threadService = new ThreadService(this._context);
-    this._gatewayService = new GatewayService(this._context);
+    const configProvider = new ConfigProvider(context);
+    this._gatewayService = new GatewayService(configProvider);
+    this._threadService = new ThreadService(context, configProvider);
   }
 
   resolveWebviewView(webviewView: vscode.WebviewView) {
@@ -45,9 +48,14 @@ export class MainWebviewViewProvider implements vscode.WebviewViewProvider {
     this._registerFileWatcher(webview);
   }
 
+  /**
+   * Open thread file in this webview.
+   *
+   * @param {string} filepath The thread file path.
+   */
   async open(filepath: string) {
     if (!this._isReady) {
-      await vscode.commands.executeCommand("vls_container_webview.focus");
+      await this.focus();
     }
     const thread = await this._threadService.readThread(filepath);
     this._webviewView?.webview.postMessage({
@@ -59,6 +67,10 @@ export class MainWebviewViewProvider implements vscode.WebviewViewProvider {
       }
     });
     this._activeFile = filepath;
+  }
+
+  async focus() {
+    await vscode.commands.executeCommand(MAIN_WEBVIEW_VIEW_PROVIDER_COMMAND_FOCUS);
   }
 
   private _registerRPC(webview: vscode.Webview) {

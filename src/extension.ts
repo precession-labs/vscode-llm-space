@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 
 import { api } from "./utils";
-import { MainWebviewViewProvider } from "./views";
+import { MAIN_WEBVIEW_VIEW_PROVIDER_VIEW_ID, MainWebviewViewProvider } from "./views";
 
 export async function activate(context: vscode.ExtensionContext) {
   const webviewProvider = new MainWebviewViewProvider(context);
@@ -15,13 +15,13 @@ function _registerCommands(
   context: vscode.ExtensionContext,
   webviewProvider: MainWebviewViewProvider
 ) {
-  api.registerWebviewViewProvider(context, "vls_container_webview", webviewProvider);
+  api.registerWebviewViewProvider(context, MAIN_WEBVIEW_VIEW_PROVIDER_VIEW_ID, webviewProvider);
   api.registerCommand(context, "vls.openWebview", async (uri?: vscode.Uri) => {
     const targetFile = uri?.fsPath ?? vscode.window.activeTextEditor?.document.uri.fsPath;
     if (!targetFile) {
       return;
     }
-    await vscode.commands.executeCommand("vls_container_webview.focus");
+    await webviewProvider.focus();
     await webviewProvider.open(targetFile);
   });
 }

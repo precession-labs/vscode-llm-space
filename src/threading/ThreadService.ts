@@ -3,17 +3,19 @@ import path from "node:path";
 import { v7 as generateUUID } from "uuid";
 import type { ExtensionContext } from "vscode";
 
-import { ConfigProvider } from "../config";
+import type { ConfigProvider } from "../config";
 import { FileType, URI } from "../filesystem";
 import type { Stat } from "../filesystem";
 import { createMD5 } from "../utils";
 import type { Thread } from "./common";
 
 export class ThreadService {
-  constructor(private readonly context: ExtensionContext) {}
+  private readonly _baseDir: string;
+  private readonly _configProvider: ConfigProvider;
 
-  get baseDir() {
-    return this.context.storageUri?.fsPath;
+  constructor(context: ExtensionContext, configProvider: ConfigProvider) {
+    this._baseDir = context.globalStorageUri.fsPath;
+    this._configProvider = configProvider;
   }
 
   /**
@@ -26,11 +28,11 @@ export class ThreadService {
     const threadId = createMD5(uri.toString());
     const prompt = await fs.readFile(uri.path.fsPath(), "utf-8");
     const latest = await this.getLatestSnapshotId(threadId);
-    if (!latest || !this.baseDir) {
+    if (!latest) {
       return {
         id: threadId,
-        model: ConfigProvider.defaults.model,
-        model_provider: ConfigProvider.defaults.provider,
+        model: this._configProvider.config.model,
+        model_provider: this._configProvider.config.provider,
         temperature: 1,
         top_p: 1,
         messages: [
@@ -43,8 +45,8 @@ export class ThreadService {
       };
     }
 
-    await this._ensureDir(path.join(this.baseDir, threadId));
-    const content = await fs.readFile(path.join(this.baseDir, threadId, latest), "utf-8");
+    await this._ensureDir(path.join(this._baseDir, threadId));
+    const content = await fs.readFile(path.join(this._baseDir, threadId, latest), "utf-8");
     const thread = JSON.parse(content) as Thread;
     if (thread.messages.length === 0) {
       thread.messages.push({
@@ -70,10 +72,7 @@ export class ThreadService {
     const uri = new URI(resource);
     const threadId = createMD5(uri.toString());
     thread.id = threadId;
-    if (!this.baseDir) {
-      return null;
-    }
-    const dir = path.join(this.baseDir, threadId);
+    const dir = path.join(this._baseDir, threadId);
     await this._ensureDir(dir);
     const file = path.join(dir, `${generateUUID()}.json`);
     await fs.writeFile(file, JSON.stringify(thread, null, 2));
@@ -86,11 +85,7 @@ export class ThreadService {
   }
 
   private async getLatestSnapshotId(threadId: string): Promise<string | null> {
-    if (!this.baseDir) {
-      return null;
-    }
-
-    const dir = path.join(this.baseDir, threadId);
+    const dir = path.join(this._baseDir, threadId);
     await this._ensureDir(dir);
     const files = await fs.readdir(dir);
     if (files.length === 0) {
