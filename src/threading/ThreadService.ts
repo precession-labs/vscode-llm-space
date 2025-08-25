@@ -3,10 +3,10 @@ import path from "node:path";
 import { v7 as generateUUID } from "uuid";
 import type { ExtensionContext } from "vscode";
 
-import { ConfigProvider } from "../config/providers";
-import type { Stat } from "../filesystem/common";
-import { FileType, URI } from "../filesystem/common";
-import { md5 } from "../utils/md5";
+import { ConfigProvider } from "../config";
+import { FileType, URI } from "../filesystem";
+import type { Stat } from "../filesystem";
+import { createMD5 } from "../utils";
 import type { Thread } from "./common";
 
 export class ThreadService {
@@ -18,11 +18,12 @@ export class ThreadService {
 
   /**
    * Read the thread content
+   *
    * @param resource The thread URI
    */
   async readThread(resource: string): Promise<Thread | null> {
     const uri = new URI(resource);
-    const threadId = md5(uri.toString());
+    const threadId = createMD5(uri.toString());
     const prompt = await fs.readFile(uri.path.fsPath(), "utf-8");
     const latest = await this.getLatestSnapshotId(threadId);
     if (!latest || !this.baseDir) {
@@ -67,7 +68,7 @@ export class ThreadService {
    */
   async writeThread(resource: string, thread: Thread): Promise<Stat | null> {
     const uri = new URI(resource);
-    const threadId = md5(uri.toString());
+    const threadId = createMD5(uri.toString());
     thread.id = threadId;
     if (!this.baseDir) {
       return null;
