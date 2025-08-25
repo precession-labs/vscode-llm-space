@@ -1,10 +1,10 @@
-# LLM Space
+# VSCode LLM Space
 
 <p align="center">
   <img src="./docs/demo.gif" width="100%" />
 </p>
 
-LLM Space, an AI context engineering develop assistant.
+LLM Space is an AI context engineering develop assistant.
 
 ## Core Features
 
@@ -33,6 +33,26 @@ LLM Space, an AI context engineering develop assistant.
   <img src="./docs/config.gif" width="100%" />
 </p>
 
-## License
+## Develop
 
-MIT License
+1. Install dependencies:
+
+   ```bash
+   pnpm i
+   ```
+
+1. Debug extension:
+
+   1. Watch:
+
+      ```bash
+      npm run watch
+      ```
+
+   1. Press `F5` to run VSCode debug.
+
+## Test
+
+```bash
+npm run test
+```
