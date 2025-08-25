@@ -6,80 +6,74 @@ import * as vscode from "vscode";
 
 import { GatewayService } from "../gateway";
 import { ThreadService } from "../threading";
-import { toast } from "../utils";
-import { isDev } from "../utils/env";
+import { env, toast } from "../utils";
 
-export class MyWebviewViewProvider implements vscode.WebviewViewProvider {
-  private _webviewView?: vscode.WebviewView;
-
+export class MainWebviewViewProvider implements vscode.WebviewViewProvider {
+  private readonly _context: vscode.ExtensionContext;
   private readonly _threadService: ThreadService;
   private readonly _gatewayService: GatewayService;
+
   private _isReady = false;
   private _activeFile?: string;
+  private _webviewView?: vscode.WebviewView;
 
-  constructor(private readonly _context: vscode.ExtensionContext) {
+  constructor(context: vscode.ExtensionContext) {
+    this._context = context;
     this._threadService = new ThreadService(this._context);
     this._gatewayService = new GatewayService(this._context);
   }
 
-  resolveWebviewView(webviewView: vscode.WebviewView): void {
+  resolveWebviewView(webviewView: vscode.WebviewView) {
     this._webviewView = webviewView;
-    webviewView.webview.options = {
+    const { webview } = webviewView;
+
+    const resourcesPath = path.join(this._context.extensionPath, "resources");
+    webview.options = {
       enableScripts: true,
-      localResourceRoots: [
-        vscode.Uri.file(path.join(this._context.extensionPath, "resources")) // 允许加载的本地资源目录
-      ]
+      localResourceRoots: [vscode.Uri.file(resourcesPath)] // Allow loading local resources.
     };
-    const baseUri = webviewView.webview.asWebviewUri(
-      vscode.Uri.file(path.join(this._context.extensionPath, "resources"))
-    );
-
-    if (isDev) {
-      webviewView.webview.html = this.buildDevHtml();
+    if (env.IS_DEV) {
+      webview.html = this.buildDevHtml();
     } else {
-      webviewView.webview.html = this.buildProdHtml(webviewView.webview.cspSource, baseUri);
+      webview.html = this.buildProdHtml(
+        webview.cspSource,
+        webview.asWebviewUri(vscode.Uri.file(resourcesPath))
+      );
     }
-    this.registerRpc(webviewView.webview);
-    this.registerFileWatcher(webviewView.webview);
+
+    this._registerRPC(webview);
+    this._registerFileWatcher(webview);
   }
 
-  onWebviewLoaded() {
-    toast.statusInfo("LLM Space is ready");
-    this._isReady = true;
-    const currentDocument = vscode.window.activeTextEditor?.document;
-    if (currentDocument && currentDocument.languageId === "markdown") {
-      this.open(currentDocument.uri.fsPath).catch(() => {});
+  async open(filepath: string) {
+    if (!this._isReady) {
+      await vscode.commands.executeCommand("vls_container_webview.focus");
     }
+    const thread = await this._threadService.readThread(filepath);
+    this._webviewView?.webview.postMessage({
+      namespace: "vls.command.open",
+      type: "command",
+      data: {
+        thread,
+        resource: filepath
+      }
+    });
+    this._activeFile = filepath;
   }
 
-  registerFileWatcher(webview: vscode.Webview) {
-    this._context.subscriptions.push(
-      vscode.workspace.onDidChangeTextDocument(event => {
-        const changedFile = event.document.uri.fsPath;
-        if (changedFile === this._activeFile) {
-          webview.postMessage({
-            namespace: "vls.event.file.changed",
-            type: "event",
-            data: {
-              resource: changedFile,
-              content: event.document.getText()
-            }
-          });
-        }
-      })
-    );
-  }
-
-  registerRpc(webview: vscode.Webview) {
+  private _registerRPC(webview: vscode.Webview) {
     webview.onDidReceiveMessage(async e => {
       // TODO: fix type.
       const { namespace, type, data } = e as {
         namespace: string;
         type: string;
-        data: Record<string, any>;
+        data: {
+          id?: string;
+          method?: string;
+        };
       };
       if (namespace === "vls.event.webview.loaded") {
-        this.onWebviewLoaded();
+        this._onWebviewLoaded();
         return;
       }
       if (type !== "json-rpc") {
@@ -87,17 +81,17 @@ export class MyWebviewViewProvider implements vscode.WebviewViewProvider {
       }
       let result;
       if (namespace === "vls.rpc/fs") {
-        result = await rpc.handleRpc<rpc.RpcService<ThreadService, any>>(
+        result = await rpc.handleRpc<rpc.RpcService<ThreadService, unknown>>(
           data,
           this._threadService,
           {
-            onError: (err: any) => {
+            onError: (err: unknown) => {
               console.error(`RPC.ERROR[fs.${data.method}] ${data.id}`, err);
             }
           }
         );
       } else if (namespace === "vls.rpc/gateway") {
-        result = await rpc.handleRpc<rpc.RpcService<GatewayService, any>>(
+        result = await rpc.handleRpc<rpc.RpcService<GatewayService, unknown>>(
           data,
           this._gatewayService
         );
@@ -139,20 +133,31 @@ export class MyWebviewViewProvider implements vscode.WebviewViewProvider {
     });
   }
 
-  async open(filePath: string) {
-    if (!this._isReady) {
-      await vscode.commands.executeCommand("vls_container_webview.focus");
+  private _registerFileWatcher(webview: vscode.Webview) {
+    this._context.subscriptions.push(
+      vscode.workspace.onDidChangeTextDocument(event => {
+        const changedFile = event.document.uri.fsPath;
+        if (this._activeFile != null && changedFile === this._activeFile) {
+          webview.postMessage({
+            namespace: "vls.event.file.changed",
+            type: "event",
+            data: {
+              resource: changedFile,
+              content: event.document.getText()
+            }
+          });
+        }
+      })
+    );
+  }
+
+  private _onWebviewLoaded() {
+    toast.statusInfo("LLM Space is ready");
+    this._isReady = true;
+    const currentDocument = vscode.window.activeTextEditor?.document;
+    if (currentDocument?.languageId === "markdown") {
+      this.open(currentDocument.uri.fsPath).catch(() => {});
     }
-    const thread = await this._threadService.readThread(filePath);
-    this._webviewView?.webview.postMessage({
-      namespace: "vls.command.open",
-      type: "command",
-      data: {
-        thread,
-        resource: filePath
-      }
-    });
-    this._activeFile = filePath;
   }
 
   private buildProdHtml(cspSource: string, baseUri: vscode.Uri): string {
@@ -176,7 +181,7 @@ export class MyWebviewViewProvider implements vscode.WebviewViewProvider {
 </body>
 
 </html>
-    `;
+`;
   }
 
   private buildDevHtml(): string {

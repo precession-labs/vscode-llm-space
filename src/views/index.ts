@@ -1,1 +1,1 @@
-export * from "./ExtensionWebview";
+export * from "./MainWebviewViewProvider";
