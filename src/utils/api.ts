@@ -35,9 +35,23 @@ export function reloadWindow() {
 /**
  * Register extension command on VSCode.
  */
-export function registerCommand(context: vscode.ExtensionContext, command: string, callback: (...args: any[]) => void) {
-  // Add to a list of disposables which are disposed when this extension is deactivated.
+export function registerCommand(
+  context: vscode.ExtensionContext,
+  command: string,
+  callback: (...args: unknown[]) => void
+) {
   context.subscriptions.push(vscode.commands.registerCommand(command, callback));
+}
+
+/**
+ * Register extension webview view provider on VSCode.
+ */
+export function registerWebviewViewProvider(
+  context: vscode.ExtensionContext,
+  viewId: string,
+  provider: vscode.WebviewViewProvider
+) {
+  context.subscriptions.push(vscode.window.registerWebviewViewProvider(viewId, provider));
 }
 
 /**
